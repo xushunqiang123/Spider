@@ -1,0 +1,41 @@
+#-*-coding:utf-8 -*-
+from urllib import request,error,parse
+from http import cookiejar
+
+#创建cookie实例
+cookie = cookiejar.CookieJar()
+#创建cookie管理器
+cookie_hander= request.HTTPCookieProcessor(cookie)
+
+#创建http请求管理器
+http_hander = request.HTTPHandler()
+#创建https请求管理器
+https_hander = request.HTTPSHandler()
+
+#创建一个请求管理实例
+opener= request.build_opener(http_hander,https_hander,cookie_hander)
+
+
+def login():
+    data = {
+    "email":"13119144223",
+    "password":"123456"
+    }
+    data = parse.urlencode(data)
+    url = "http://www.renren.com/PLogin.do"
+    req = request.Request(url,data=data.encode())
+
+    rsp = opener.open(req)
+def getpage():
+    url = "http://www.renren.com/965187997/profile"
+
+    rsp = opener.open(url)
+    html = rsp.read()
+
+    with open("03.html","wb+") as f:
+        f.write(html)
+
+if __name__ == '__main__':
+    login()
+    getpage()
+
