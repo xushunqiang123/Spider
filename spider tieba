@@ -1,0 +1,30 @@
+#-*-coding:utf-8 -*-
+'''
+第一页：https://tieba.baidu.com/f?kw=%E5%BC%A0%E7%BB%A7%E7%A7%91&ie=utf-8&pn=0
+第二页：https://tieba.baidu.com/f?kw=%E5%BC%A0%E7%BB%A7%E7%A7%91&ie=utf-8&pn=50
+第三页：https://tieba.baidu.com/f?kw=%E5%BC%A0%E7%BB%A7%E7%A7%91&ie=utf-8&pn=100
+第三页：https://tieba.baidu.com/f?kw=%E5%BC%A0%E7%BB%A7%E7%A7%91&ie=utf-8&pn=150
+第四页：https://tieba.baidu.com/f?kw=%E5%BC%A0%E7%BB%A7%E7%A7%91&ie=utf-8&pn=200
+'''
+
+from urllib import request,parse
+
+baseurl = "https://tieba.baidu.com/f?"
+
+dics = {
+    "kw" : "张继科",
+    "ie":"utf-8",
+    "pn":"0"
+}
+
+for i in range(5):
+    dics["pn"] = i * 50
+    url = baseurl + parse.urlencode(dics)
+    print(url)
+    rsp = request.urlopen(url)
+    html = rsp.read()
+    with open("0{}.html".format(i),"wb+") as f:
+        f.write(html)
+    html = html.decode()
+    # print(html)
+
