@@ -1,0 +1,106 @@
+#-*-coding:utf-8 -*-
+import itchat
+import json
+from datetime import datetime
+
+def out_curtime():
+    curren_time =  str(datetime.now())[0:19]
+    return curren_time
+
+def lc():
+    print("Finash Login!")
+def ec():
+    print("exit")
+
+name_list = []
+data_dict = {}
+data_group = {}
+
+
+#好友私聊窗口聊天信息抓取
+@itchat.msg_register(itchat.content.TEXT)
+def print_content(msg):
+    faa = itchat.search_friends()
+    master =faa["RemarkName"] if faa["RemarkName"] !="" else faa["NickName"]
+#分析msg的数据结构
+    # print("*"*10)
+    # # print(msg)
+    # for ele in msg:
+    #     print("{0}:{1}".format(ele,msg[ele]))
+    # print("*"*10)
+
+
+    # print("*"*10)
+    # print(msg["FromUserName"])
+    fro = itchat.search_friends(userName= msg["FromUserName"])
+    # print(fro)
+    to_fre = itchat.search_friends(userName= msg["ToUserName"])
+    # print(fre)
+    # print(fre["NickName"])
+#选出出发地的备注名称或者没有备注名称是使用昵称，使用三元运算符
+    from_username = fro["RemarkName"] if fro["RemarkName"] != "" else fro["NickName"]
+    # print(from_username)
+
+#选出目的地的备注名称或者没有备注名称是使用昵称，使用三元运算符
+    # name1 = to_fre["RemarkName"]
+    # name2 = to_fre["NickName"]
+    to_username = to_fre["RemarkName"] if to_fre["RemarkName"] != "" else to_fre["NickName"]
+    # print(to_username)
+    if from_username == master:
+        cur_time = out_curtime()
+        print("({0}与{1}私聊窗口)中{0} send to {1} :{2}".format(from_username,to_username,msg["Text"]))
+        data_dict[from_username + " to " + to_username + cur_time] = msg["Text"]
+        # print(data_dict)
+        with open("{}.json".format(to_username),"w") as f:
+            json.dump(data_dict,f,sort_keys=True,indent =4,separators=(' ,', '  : '))
+            # print("存入成功！！！")
+    else:
+        cur_time = out_curtime()
+        print("({0}与{1}私聊窗口)中{0} send to {1} :{2}".format(from_username,to_username,msg["Text"]))
+        data_dict[from_username + " to " + to_username + cur_time] = msg["Text"]
+        # print(data_dict)
+        with open("{}.json".format(from_username),"w") as f:
+            json.dump(data_dict,f,sort_keys=True,indent =4,separators=(' ,', '  : '))
+            # print("存入成功！！！")
+
+
+
+#群聊信息抓取
+@itchat.msg_register(itchat.content.TEXT,isGroupChat= True)
+def print_picture(msg):
+    room_name = msg["User"]["NickName"]
+    try:
+        # print(msg)
+        froq = itchat.search_friends(userName= msg["FromUserName"])
+    #获取说话者的名字
+        speapkerark = froq["RemarkName"]
+        speapker = speapkerark if speapkerark !="" else froq["NickName"]
+        # print(speapker)
+    #打印完整的信息
+        # print("在(%s) 群中 (%s) 说：%s" %(room_name,speapker,msg["Text"]))
+        print("在({0}) 群中 ({1}) 说：{2}" .format(room_name,speapker,msg["Text"]))
+        cur_time = out_curtime()
+        data_group[speapker + cur_time] = msg["Text"]
+        with open("{}.json".format(room_name),"w") as qun:
+            json.dump(data_group,qun,sort_keys=True,indent =4,separators=(' ,', '  : '))
+            # print("存入成功！！！")
+    except Exception as e:
+        pass
+
+
+#
+# @itchat.msg_register(itchat.content.RECORDING)
+# def print_recording(msg):
+#     print(msg['Recording'])
+
+
+
+if __name__ == '__main__':
+    itchat.auto_login(loginCallback=lc, exitCallback=ec,hotReload=True)
+    frien_list = itchat.get_friends()
+    # for ele in frien_list:
+    #     name = ele["RemarkName"] if ele["RemarkName"] !="" else ele["NickName"]
+    # print("{}".format(name))
+    itchat.run()
+
+
